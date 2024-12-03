@@ -29,4 +29,4 @@ Esse projeto foi desenvolvido com as seguintes tecnologias:
 - Rode um servidor [MySQL](https://www.mysql.com), como por exemplo o [XAMPP](https://www.apachefriends.org/pt_br/index.html).
 - Cole o SQL no [XAMPP](https://www.apachefriends.org/pt_br/index.html) e confirme.
 
-E pronto, agora você pode inicializar o [Main.java](https://github.com/drypzz/eventSystem/blob/master/db.sql).
+E pronto, agora você pode inicializar o [Main.java](https://github.com/drypzz/eventSystem/blob/master/src/Main.java).
