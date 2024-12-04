@@ -79,7 +79,7 @@ public class Funcoes {
     public static void atualizarPessoa(Connection connection, Scanner scanner) throws Exception {
 
         listarPessoas(connection);
-
+    
         System.out.print("\n* Digite o ID da pessoa a ser atualizada: ");
         int id = scanner.nextInt();
         scanner.nextLine(); // Limpa o buffer
@@ -98,7 +98,7 @@ public class Funcoes {
                 }
             }
         }
-
+    
         // Verifica se a pessoa é Organizador ou Participante
         String verificaSql = "SELECT 'Organizador' AS tipo FROM Organizador WHERE id = ? " + "UNION " + "SELECT 'Participante' AS tipo FROM Participante WHERE id = ?";
         String tipoPessoa = null;
@@ -148,16 +148,27 @@ public class Funcoes {
                     System.out.println("2. Não");
                     System.out.print("Escolha: ");
                     int confirmacao = scanner.nextInt();
+                    scanner.nextLine(); // Limpa o buffer após nextInt()
+    
                     if (confirmacao == 1) {
+                        System.out.print("\n* Digite o telefone do participante: ");
+                        String telefone = scanner.nextLine();
+    
+                        if (telefone.length() < 11 || telefone.isEmpty()) {
+                            System.out.println("\n* Telefone inválido. Não foi possível alterar.");
+                            return;
+                        }
+    
                         // Deleta da tabela Organizador e insere na tabela Participante
                         String deleteOrganizadorSql = "DELETE FROM Organizador WHERE id = ?";
-                        String insertParticipanteSql = "INSERT INTO Participante (id, telefone) VALUES (?, NULL)";
+                        String insertParticipanteSql = "INSERT INTO Participante (id, telefone) VALUES (?, ?)";
                         try (PreparedStatement deleteStmt = connection.prepareStatement(deleteOrganizadorSql);
-                             PreparedStatement insertStmt = connection.prepareStatement(insertParticipanteSql)) {
+                        PreparedStatement insertStmt = connection.prepareStatement(insertParticipanteSql)) {
                             deleteStmt.setInt(1, id);
                             deleteStmt.executeUpdate();
     
                             insertStmt.setInt(1, id);
+                            insertStmt.setString(2, telefone);
                             insertStmt.executeUpdate();
     
                             System.out.println("\n* Tipo alterado para Participante com sucesso!");
@@ -169,16 +180,27 @@ public class Funcoes {
                     System.out.println("2. Não");
                     System.out.print("Escolha: ");
                     int confirmacao = scanner.nextInt();
+                    scanner.nextLine(); // Limpa o buffer após nextInt()
+    
                     if (confirmacao == 1) {
+                        System.out.print("\n* Digite o email do organizador: ");
+                        String email = scanner.nextLine();
+    
+                        if (email.isEmpty()) {
+                            System.out.println("\n* Email inválido. Não foi possível alterar.");
+                            return;
+                        }
+    
                         // Deleta da tabela Participante e insere na tabela Organizador
                         String deleteParticipanteSql = "DELETE FROM Participante WHERE id = ?";
-                        String insertOrganizadorSql = "INSERT INTO Organizador (id, email) VALUES (?, '')";
+                        String insertOrganizadorSql = "INSERT INTO Organizador (id, email) VALUES (?, ?)";
                         try (PreparedStatement deleteStmt = connection.prepareStatement(deleteParticipanteSql);
-                             PreparedStatement insertStmt = connection.prepareStatement(insertOrganizadorSql)) {
+                        PreparedStatement insertStmt = connection.prepareStatement(insertOrganizadorSql)) {
                             deleteStmt.setInt(1, id);
                             deleteStmt.executeUpdate();
     
                             insertStmt.setInt(1, id);
+                            insertStmt.setString(2, email);
                             insertStmt.executeUpdate();
     
                             System.out.println("\n* Tipo alterado para Organizador com sucesso!");
@@ -193,6 +215,7 @@ public class Funcoes {
                 System.out.println("\n* Opção inválida!");
         }
     }
+    
 
 
     // 4. Deletar Pessoa

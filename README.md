@@ -3,7 +3,7 @@
 ## 📰 Informações
 
 - version 1.0.0
-- author: [@drypzz](https://github.com/drypzz), [@functionss](https://github.com/function404)
+- author: [@drypzz](https://github.com/drypzz) (Gustavo), [@functionss](https://github.com/function404) (Lincoln)
 
 ---
 
