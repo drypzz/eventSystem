@@ -4,7 +4,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         try (Connection connection = Database.getConnection();
-             Scanner scanner = new Scanner(System.in)) {
+                Scanner scanner = new Scanner(System.in)) {
 
             int opcaoPrincipal;
             do {
@@ -61,16 +61,16 @@ public class Main {
 
             switch (opcao) {
                 case 1:
-                    Funcoes.listarPessoas(connection);
+                    Pessoa.listarPessoas(connection);
                     break;
                 case 2:
-                    Funcoes.inserirPessoa(connection, scanner);
+                    Pessoa.inserirPessoa(connection, scanner);
                     break;
                 case 3:
-                    Funcoes.atualizarPessoa(connection, scanner);
+                    Pessoa.atualizarPessoa(connection, scanner);
                     break;
                 case 4:
-                    Funcoes.deletarPessoa(connection, scanner);
+                    Pessoa.deletarPessoa(connection, scanner);
                     break;
                 case 5:
                     System.out.println("\n* Voltando ao Menu Principal...");
@@ -89,26 +89,34 @@ public class Main {
             System.out.println("\n\n=====[ MENU LOCAIS ]=====");
             System.out.println("[1] - Listar Locais");
             System.out.println("[2] - Inserir Local");
-            System.out.println("[3] - Voltar ao Menu Principal");
+            System.out.println("[3] - Atualizar Local");
+            System.out.println("[4] - Deletar Local");
+            System.out.println("[5] - Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
             scanner.nextLine(); // Limpa o buffer
 
             switch (opcao) {
                 case 1:
-                    Funcoes.listarLocais(connection);
+                    Local.listarLocais(connection);
                     break;
                 case 2:
-                    Funcoes.inserirLocal(connection, scanner);
+                    Local.inserirLocal(connection, scanner);
                     break;
                 case 3:
+                    Local.atualizarLocal(connection, scanner);
+                    break;
+                case 4:
+                    Local.deletarLocal(connection, scanner);
+                    break;
+                case 5:
                     System.out.println("\n* Voltando ao Menu Principal...");
                     break;
                 default:
                     System.out.println("\n* Opção inválida!");
                     break;
             }
-        } while (opcao != 3);
+        } while (opcao != 5);
     }
 
     // Menu de Eventos
@@ -118,26 +126,34 @@ public class Main {
             System.out.println("\n\n=====[ MENU EVENTOS ]=====");
             System.out.println("[1] - Listar Eventos");
             System.out.println("[2] - Inserir Evento");
-            System.out.println("[3] - Voltar ao Menu Principal");
+            System.out.println("[3] - Atualizar Evento");
+            System.out.println("[4] - Deletar Evento");
+            System.out.println("[5] - Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
             scanner.nextLine(); // Limpa o buffer
 
             switch (opcao) {
                 case 1:
-                    Funcoes.listarEventos(connection);
+                    Evento.listarEventos(connection);
                     break;
                 case 2:
-                    Funcoes.inserirEvento(connection, scanner);
+                    Evento.inserirEvento(connection, scanner);
                     break;
                 case 3:
+                    Evento.atualizarEvento(connection, scanner);
+                    break;
+                case 4:
+                    Evento.deletarEvento(connection, scanner);
+                    break;
+                case 5:
                     System.out.println("\n* Voltando ao Menu Principal...");
                     break;
                 default:
                     System.out.println("\n* Opção inválida!");
                     break;
             }
-        } while (opcao != 3);
+        } while (opcao != 5);
     }
 
     // Menu de Participantes
@@ -147,25 +163,29 @@ public class Main {
             System.out.println("\n\n=====[ MENU PARTICIPANTES ]=====");
             System.out.println("[1] - Listar Participantes de um Evento");
             System.out.println("[2] - Adicionar Participante ao Evento");
-            System.out.println("[3] - Voltar ao Menu Principal");
+            System.out.println("[3] - Remover Participante de um Evento");
+            System.out.println("[4] - Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
             scanner.nextLine(); // Limpa o buffer
 
             switch (opcao) {
                 case 1:
-                    Funcoes.listarParticipantesDeEvento(connection, scanner);
+                    Participantes.listarParticipantesDeEvento(connection, scanner);
                     break;
                 case 2:
-                    Funcoes.adicionarParticipanteAoEvento(connection, scanner);
+                    Participantes.adicionarParticipanteAoEvento(connection, scanner);
                     break;
                 case 3:
+                    Participantes.removerParticipanteDeEvento(connection, scanner);
+                    break;
+                case 4:
                     System.out.println("\n* Voltando ao Menu Principal...");
                     break;
                 default:
                     System.out.println("\n* Opção inválida!");
                     break;
             }
-        } while (opcao != 3);
+        } while (opcao != 4);
     }
 };

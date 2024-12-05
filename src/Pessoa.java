@@ -1,8 +1,9 @@
 import java.sql.*;
 import java.util.Scanner;
 
-public class Funcoes {
-    // 1. Listar Pessoas
+public class Pessoa {
+
+    // Listar Pessoas
     public static void listarPessoas(Connection connection) throws Exception {
         // Consulta para listar as pessoas e identificar se são Organizadores ou Participantes
         String sql = "SELECT p.id, p.nome, CASE WHEN o.id IS NOT NULL THEN 'Organizador' WHEN pa.id IS NOT NULL THEN 'Participante' ELSE 'Nenhum' END AS tipo FROM Pessoa p LEFT JOIN Organizador o ON p.id = o.id LEFT JOIN Participante pa ON p.id = pa.id;";
@@ -19,9 +20,8 @@ public class Funcoes {
             }
         }
     }
-    
 
-    // 2. Inserir Pessoa
+    // Inserir Pessoa
     public static void inserirPessoa(Connection connection, Scanner scanner) throws Exception {
         System.out.print("\n* Digite o nome da pessoa: ");
         String nome = scanner.nextLine();
@@ -75,7 +75,7 @@ public class Funcoes {
         }
     }
 
-    // 3. Atualizar Pessoa
+    // Atualizar Pessoa
     public static void atualizarPessoa(Connection connection, Scanner scanner) throws Exception {
 
         listarPessoas(connection);
@@ -216,9 +216,7 @@ public class Funcoes {
         }
     }
     
-
-
-    // 4. Deletar Pessoa
+    // Deletar Pessoa
     public static void deletarPessoa(Connection connection, Scanner scanner) throws Exception {
 
         listarPessoas(connection);
@@ -305,228 +303,6 @@ public class Funcoes {
         } finally {
             // Restaura o modo de auto-commit
             connection.setAutoCommit(true);
-        }
-    }
-    
-
-    // 5. Listar Locais
-    public static void listarLocais(Connection connection) throws Exception {
-        String sql = "SELECT * FROM Local";
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-             
-            if (!rs.isBeforeFirst()) {
-                System.out.println("\n* Nenhum local cadastrado.");
-                return;
-            }
-    
-            System.out.println("\n===== Lista de Locais =====");
-            while (rs.next()) {
-                System.out.printf("ID: %d | Descrição: %s | Vagas: %d%n", rs.getInt("id"), rs.getString("descricao"), rs.getInt("vagas"));
-            }
-        }
-    }
-
-    // 6. Inserir Local
-    public static void inserirLocal(Connection connection, Scanner scanner) throws Exception {
-        System.out.print("\n* Digite a descrição do local: ");
-        String descricao = scanner.nextLine();
-        System.out.print("\n* Digite o número de vagas: ");
-        int vagas = scanner.nextInt();
-
-        String sql = "INSERT INTO Local (descricao, vagas) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, descricao);
-            stmt.setInt(2, vagas);
-            stmt.executeUpdate();
-            System.out.println("\n* Local inserido com sucesso!");
-        }
-    }
-
-    // 7. Listar Eventos
-    public static void listarEventos(Connection connection) throws Exception {
-        String sql = "SELECT * FROM Evento";
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-        ResultSet rs = stmt.executeQuery()) {
-            if (!rs.isBeforeFirst()) {
-                System.out.println("\n* Nenhum evento cadastrado.");
-                return;
-            }
-            System.out.println("\n===== Lista de Eventos =====");
-            while (rs.next()) {
-                System.out.printf("ID: %d | Descrição: %s | Data: %s | Vagas: %d%n", rs.getInt("id"), rs.getString("descricao"), rs.getTimestamp("data"), rs.getInt("vagas"));
-            }
-        }
-    }
-
-    // 8. Inserir Evento
-    public static void inserirEvento(Connection connection, Scanner scanner) throws Exception {
-
-        boolean organizadoresDisponiveis = listarOrganizadoresDisponiveis(connection);
-
-        if (!organizadoresDisponiveis) {
-            System.out.println("\n* Não há organizadores disponíveis para criar um evento.");
-            return;
-        }
-
-        System.out.print("\n* Digite o ID do organizador: ");
-        int idOrganizador = scanner.nextInt();
-
-        listarLocais(connection);
-
-        System.out.print("\n* Digite o ID do local: ");
-        int idLocal = scanner.nextInt();
-        scanner.nextLine(); // Limpa o buffer
-        System.out.print("\n* Digite a descrição do evento: ");
-        String descricao = scanner.nextLine();
-        System.out.print("\n* Digite a data e hora (YYYY-MM-DD HH:MM:SS): ");
-        String data = scanner.nextLine();
-        System.out.print("\n* Digite o número de vagas: ");
-        int vagas = scanner.nextInt();
-
-        String sql = "INSERT INTO Evento (idOrganizador, idLocal, data, descricao, vagas) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, idOrganizador);
-            stmt.setInt(2, idLocal);
-            stmt.setString(3, data);
-            stmt.setString(4, descricao);
-            stmt.setInt(5, vagas);
-            stmt.executeUpdate();
-            System.out.println("\n* Evento inserido com sucesso!");
-        }
-    }
-
-    // 9. Listar Participantes de um Evento
-    public static void listarParticipantesDeEvento(Connection connection, Scanner scanner) throws Exception {
-
-        listarEventos(connection);
-
-        System.out.print("\n* Digite o ID do evento: ");
-        int idEvento = scanner.nextInt();
-
-        // Consulta para listar os participantes de um evento
-        String sql = "SELECT P.nome FROM EventoParticipante EP JOIN Pessoa P ON EP.idParticipante = P.id WHERE EP.idEvento = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, idEvento);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (!rs.isBeforeFirst()) {
-                    System.out.println("\n* Nenhum participante cadastrado para este evento.");
-                    return;
-                }
-                System.out.println("\n===== Participantes =====");
-                while (rs.next()) {
-                    System.out.println("Nome: " + rs.getString("nome"));
-                }
-            }
-        }
-    }
-
-    // 10. Adicionar Participante ao Evento
-    public static void adicionarParticipanteAoEvento(Connection connection, Scanner scanner) throws Exception {
-
-        listarEventos(connection);
-
-        System.out.print("\n* Digite o ID do evento: ");
-        int idEvento = scanner.nextInt();
-    
-        // Listar participantes disponíveis
-        boolean participantesDisponiveis = listarParticipantesDisponiveis(connection);
-    
-        // Se não houver participantes disponíveis, cancela a operação
-        if (!participantesDisponiveis) {
-            System.out.println("\n* Não há participantes disponíveis.");
-            return;
-        }
-    
-        System.out.print("\n* Digite o ID do participante: ");
-        int idParticipante = scanner.nextInt();
-    
-        connection.setAutoCommit(false); // Inicia a transação
-    
-        try {
-            // Verifica se há vagas no evento
-            String verificarVagasSql = "SELECT vagas FROM Evento WHERE id = ?";
-            int vagasDisponiveis = 0;
-    
-            try (PreparedStatement stmt = connection.prepareStatement(verificarVagasSql)) {
-                stmt.setInt(1, idEvento);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        vagasDisponiveis = rs.getInt("vagas");
-                    } else {
-                        System.out.println("\n* Evento não encontrado.");
-                        return;
-                    }
-                }
-            }
-    
-            if (vagasDisponiveis <= 0) {
-                System.out.println("\n* Não há vagas disponíveis neste evento.");
-                return;
-            }
-    
-            // Adiciona o participante ao evento
-            String inserirParticipanteSql = "INSERT INTO EventoParticipante (idEvento, idParticipante) VALUES (?, ?)";
-            try (PreparedStatement stmt = connection.prepareStatement(inserirParticipanteSql)) {
-                stmt.setInt(1, idEvento);
-                stmt.setInt(2, idParticipante);
-                stmt.executeUpdate();
-            }
-    
-            // Atualiza o número de vagas no evento
-            String atualizarVagasSql = "UPDATE Evento SET vagas = vagas - 1 WHERE id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(atualizarVagasSql)) {
-                stmt.setInt(1, idEvento);
-                stmt.executeUpdate();
-            }
-    
-            connection.commit(); // Confirma a transação
-            System.out.println("\n* Participante adicionado ao evento com sucesso!");
-    
-        } catch (Exception e) {
-            connection.rollback(); // Reverte a transação em caso de erro
-            System.err.println("\n* Erro ao adicionar participante ao evento: " + e.getMessage());
-        } finally {
-            connection.setAutoCommit(true); // Restaura o modo de auto-commit
-        }
-    }
-    
-    // Função para listar participantes disponíveis e retornar se há participantes ou não
-    public static boolean listarParticipantesDisponiveis(Connection connection) throws Exception {
-        // Consulta para listar participantes disponíveis
-        String sql = "SELECT p.id, p.nome FROM Pessoa p JOIN Participante t ON p.id = t.id WHERE p.id NOT IN ( SELECT idParticipante FROM EventoParticipante );";
-    
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-    
-            if (!rs.isBeforeFirst()) {
-                return false; // Não há participantes disponíveis
-            }
-    
-            System.out.println("\n==== Lista de Participantes Disponíveis ====");
-            while (rs.next()) {
-                System.out.printf("ID: %d | Nome: %s%n", rs.getInt("id"), rs.getString("nome"));
-            }
-            return true; // Há participantes disponíveis
-        }
-    }
-    
-    public static boolean listarOrganizadoresDisponiveis(Connection connection) throws Exception {
-        // Consulta para listar organizadores disponíveis
-        String sql = "SELECT p.id, p.nome FROM Pessoa p JOIN Organizador t ON p.id = t.id WHERE p.id NOT IN ( SELECT idOrganizador FROM Evento );";
-    
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-    
-            if (!rs.isBeforeFirst()) {
-                return false; // Não há organizadores disponíveis
-            }
-    
-            System.out.println("\n==== Lista de Organizadores Disponíveis ====");
-            while (rs.next()) {
-                System.out.printf("ID: %d | Nome: %s%n", rs.getInt("id"), rs.getString("nome"));
-            }
-            return true; // Há organizadores disponíveis
         }
     }
 }
